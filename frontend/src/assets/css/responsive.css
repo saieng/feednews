@@ -1,0 +1,81 @@
+/* 响应式样式 */
+
+/* 移动设备 - 小屏幕 */
+@media (max-width: 640px) {
+  .text-container {
+    padding: 0 1rem;
+  }
+  
+  .scroll-text {
+    font-size: 1.25rem !important; /* 覆盖内联样式 */
+  }
+  
+  .scroll-indicator {
+    bottom: 1.5rem !important;
+    z-index: 50 !important;
+  }
+}
+
+/* 平板设备 - 中等屏幕 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .text-container {
+    padding: 0 2rem;
+  }
+  
+  .scroll-text {
+    font-size: 1.5rem;
+  }
+}
+
+/* 桌面设备 - 大屏幕 */
+@media (min-width: 1025px) {
+  .text-container {
+    padding: 0 3rem;
+  }
+  
+  .scroll-text {
+    font-size: 1.75rem;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  .scroll-indicator {
+    display: block;
+    opacity: 0.8;
+  }
+  
+  .touch-scroll-hint {
+    display: block;
+  }
+}
+
+/* 非触摸设备优化 */
+@media (hover: hover) and (pointer: fine) {
+  .touch-scroll-hint {
+    display: none;
+  }
+}
+
+/* 文字滚动效果增强 */
+.scroll-text {
+  transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: transform, opacity, font-size;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* 中心文字高亮效果 */
+.scroll-text[style*="fontWeight: 600"] {
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+/* 滚动指示器样式增强 */
+.scroll-indicator {
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-indicator:hover {
+  opacity: 1 !important;
+}

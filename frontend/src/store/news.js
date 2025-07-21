@@ -1,0 +1,103 @@
+import { defineStore } from 'pinia'
+import { newsService } from '@/services/newsService'
+
+export const useNewsStore = defineStore('news', {
+  state: () => ({
+    newsList: [],
+    currentPage: 1,
+    totalNews: 0,
+    isLoading: false,
+    hasMore: true,
+  }),
+
+  actions: {
+    async fetchNews(page = 1, limit = 12) {
+      this.isLoading = true
+      try {
+        const response = await newsService.getNews({ page, limit })
+        
+        if (page === 1) {
+          this.newsList = response.data.news
+        } else {
+          this.newsList.push(...response.data.news)
+        }
+        
+        this.currentPage = page
+        this.totalNews = response.data.total
+        this.hasMore = this.newsList.length < this.totalNews
+        
+        return { success: true }
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error.response?.data?.message || '获取新闻失败' 
+        }
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    async loadMoreNews() {
+      if (!this.hasMore || this.isLoading) return
+      
+      const nextPage = this.currentPage + 1
+      return await this.fetchNews(nextPage)
+    },
+
+    async createNews(newsData) {
+      try {
+        const response = await newsService.createNews(newsData)
+        this.newsList.unshift(response.data)
+        this.totalNews += 1
+        return { success: true, data: response.data }
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error.response?.data?.message || '创建新闻失败' 
+        }
+      }
+    },
+
+    async updateNews(id, newsData) {
+      try {
+        const response = await newsService.updateNews(id, newsData)
+        const index = this.newsList.findIndex(news => news.id === id)
+        if (index !== -1) {
+          this.newsList[index] = response.data
+        }
+        return { success: true, data: response.data }
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error.response?.data?.message || '更新新闻失败' 
+        }
+      }
+    },
+
+    async deleteNews(id) {
+      try {
+        await newsService.deleteNews(id)
+        this.newsList = this.newsList.filter(news => news.id !== id)
+        this.totalNews -= 1
+        return { success: true }
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error.response?.data?.message || '删除新闻失败' 
+        }
+      }
+    },
+
+    async getNewsById(id) {
+      try {
+        const response = await newsService.getNewsById(id)
+        return { success: true, data: response.data }
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error.response?.data?.message || '获取新闻详情失败' 
+        }
+      }
+    },
+  },
+})
