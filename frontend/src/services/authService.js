@@ -38,7 +38,16 @@ class AuthService {
   }
 
   async login(credentials) {
-    return this.api.post('/login', credentials)
+    // 根据后端API规范，登录接口使用form-data格式
+    const formData = new FormData()
+    formData.append('username', credentials.email) // 支持邮箱登录
+    formData.append('password', credentials.password)
+    
+    return this.api.post('/token', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
   }
 
   async register(userInfo) {

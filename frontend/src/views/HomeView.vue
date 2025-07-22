@@ -49,6 +49,32 @@
               </div>
             </div>
           </div>
+          
+          <!-- 用户认证区域 -->
+          <div class="flex items-center space-x-4">
+            <!-- 未登录状态 -->
+            <div v-if="!authStore.isLoggedIn" class="flex items-center space-x-2">
+              <button 
+                @click="openAuthModal"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black"
+              >
+                登录 / 注册
+              </button>
+            </div>
+            
+            <!-- 已登录状态 -->
+            <div v-else class="flex items-center space-x-3">
+              <span class="text-white text-sm">
+                欢迎，{{ authStore.user?.username || authStore.user?.email }}
+              </span>
+              <button 
+                @click="handleLogout"
+                class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white border border-gray-600 hover:border-gray-400 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black"
+              >
+                退出登录
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
@@ -130,15 +156,28 @@
         </div>
       </section>
     </div>
+    
+    <!-- 认证模态框 -->
+    <AuthModal 
+      :is-open="showAuthModal" 
+      @close="closeAuthModal" 
+      @success="handleAuthSuccess" 
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useNewsStore } from '@/store/news'
+import { useAuthStore } from '@/store/auth'
 import NewsGrid from '@/components/news/NewsGrid.vue'
+import AuthModal from '@/components/auth/AuthModal.vue'
 
 const newsStore = useNewsStore()
+const authStore = useAuthStore()
+
+// 认证相关状态
+const showAuthModal = ref(false)
 
 const searchQuery = ref('')
 const isLoading = ref(false)
@@ -573,7 +612,52 @@ const handleKeyPress = (event) => {
   }
 }
 
-onMounted(() => {
+
+
+onUnmounted(() => {
+  if (animationFrame.value) {
+    cancelAnimationFrame(animationFrame.value);
+  }
+  // 清理logo动画定时器
+  if (logoInterval) {
+    clearInterval(logoInterval);
+  }
+  window.removeEventListener('resize', handleResize);
+  window.removeEventListener('keydown', handleKeyPress); // 移除键盘事件监听
+  if (scrollContainer.value) {
+    scrollContainer.value.removeEventListener('scroll', handleScroll);
+  }
+});
+
+// 认证相关方法
+const openAuthModal = () => {
+  showAuthModal.value = true
+}
+
+const closeAuthModal = () => {
+  showAuthModal.value = false
+}
+
+const handleAuthSuccess = () => {
+  showAuthModal.value = false
+  // 可以在这里添加登录成功后的逻辑，比如显示欢迎消息
+}
+
+const handleLogout = () => {
+  authStore.logout()
+  // 可以在这里添加退出登录后的逻辑
+}
+
+// 监听搜索词变化
+watch(searchQuery, () => {
+  handleSearch()
+})
+
+// 在组件挂载时检查认证状态
+onMounted(async () => {
+  // 检查认证状态
+  await authStore.checkAuthStatus()
+  
   windowHeight.value = window.innerHeight;
 
   // 启动logo动画
@@ -601,24 +685,4 @@ onMounted(() => {
   window.addEventListener('keydown', handleKeyPress); // 添加键盘事件监听
   scrollContainer.value.addEventListener('scroll', handleScroll);
 });
-
-onUnmounted(() => {
-  if (animationFrame.value) {
-    cancelAnimationFrame(animationFrame.value);
-  }
-  // 清理logo动画定时器
-  if (logoInterval) {
-    clearInterval(logoInterval);
-  }
-  window.removeEventListener('resize', handleResize);
-  window.removeEventListener('keydown', handleKeyPress); // 移除键盘事件监听
-  if (scrollContainer.value) {
-    scrollContainer.value.removeEventListener('scroll', handleScroll);
-  }
-});
-
-// 监听搜索词变化
-watch(searchQuery, () => {
-  handleSearch()
-})
 </script>

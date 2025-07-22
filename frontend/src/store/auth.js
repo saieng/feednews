@@ -15,8 +15,12 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials) {
       try {
         const response = await authService.login(credentials)
-        this.token = response.data.token
-        this.user = response.data.user
+        this.token = response.data.access_token
+        // 从token中解析用户信息或设置基本用户信息
+        this.user = {
+          email: credentials.email,
+          username: credentials.email.split('@')[0] // 临时从邮箱提取用户名
+        }
         
         localStorage.setItem('token', this.token)
         localStorage.setItem('user', JSON.stringify(this.user))
@@ -25,7 +29,7 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         return { 
           success: false, 
-          error: error.response?.data?.message || '登录失败' 
+          error: error.response?.data?.detail || '登录失败' 
         }
       }
     },
@@ -33,17 +37,19 @@ export const useAuthStore = defineStore('auth', {
     async register(userInfo) {
       try {
         const response = await authService.register(userInfo)
-        this.token = response.data.token
-        this.user = response.data.user
+        // 注册成功后，设置用户信息
+        this.user = {
+          username: userInfo.username,
+          email: userInfo.email
+        }
         
-        localStorage.setItem('token', this.token)
         localStorage.setItem('user', JSON.stringify(this.user))
         
         return { success: true }
       } catch (error) {
         return { 
           success: false, 
-          error: error.response?.data?.message || '注册失败' 
+          error: error.response?.data?.detail || '注册失败' 
         }
       }
     },

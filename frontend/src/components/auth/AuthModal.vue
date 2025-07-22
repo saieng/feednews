@@ -35,13 +35,15 @@
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                {{ isLoginMode ? '用户名或邮箱' : '邮箱' }}
+              </label>
               <input 
                 v-model="form.email"
-                type="email"
+                :type="isLoginMode ? 'text' : 'email'"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="请输入邮箱"
+                :placeholder="isLoginMode ? '请输入用户名或邮箱' : '请输入邮箱'"
               >
             </div>
             
