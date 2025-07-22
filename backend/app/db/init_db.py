@@ -14,6 +14,9 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
+    # 预先计算密码哈希（在异步上下文外）
+    admin_password_hash = get_password_hash("admin123")
+    
     # 创建默认管理员用户
     async with AsyncSession(engine) as session:
         # 检查是否已存在管理员用户
@@ -26,11 +29,12 @@ async def init_db() -> None:
             admin_user = User(
                 username="admin",
                 email="admin@feednews.com",
-                hashed_password=get_password_hash("admin123"),
+                hashed_password=admin_password_hash,
                 is_admin=True
             )
             session.add(admin_user)
             await session.commit()
+            await session.refresh(admin_user)
             print("默认管理员用户已创建: admin / admin123")
         else:
             print("管理员用户已存在")

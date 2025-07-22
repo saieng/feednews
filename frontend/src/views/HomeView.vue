@@ -564,7 +564,7 @@ const fetchNews = async (page = 1) => {
   isLoading.value = true
   error.value = null
 
-  const result = await newsStore.fetchNews(page, 12)
+  const result = await newsStore.fetchNews(page, 12, searchQuery.value)
   if (!result.success) {
     error.value = result.error
   }
@@ -575,7 +575,7 @@ const loadMoreNews = async () => {
   if (isLoading.value || !hasMore.value) return
 
   isLoading.value = true
-  const result = await newsStore.loadMoreNews()
+  const result = await newsStore.loadMoreNews(searchQuery.value)
   if (!result.success) {
     error.value = result.error
   }
@@ -669,19 +669,28 @@ onMounted(async () => {
   
   windowHeight.value = window.innerHeight;
 
-  // 启动logo动画
-  logoInterval = setInterval(() => {
-    logoScale.value = !logoScale.value;
-  }, 1000); // 每秒切换一次缩放状态
+  // 检查是否从管理后台返回，如果是则跳过Logo动画
+  const fromAdmin = sessionStorage.getItem('fromAdmin')
+  if (fromAdmin) {
+    // 清除标记
+    sessionStorage.removeItem('fromAdmin')
+    // 直接隐藏Logo，跳过动画
+    showLogo.value = false
+  } else {
+    // 启动logo动画
+    logoInterval = setInterval(() => {
+      logoScale.value = !logoScale.value;
+    }, 1000); // 每秒切换一次缩放状态
 
-  // 5秒后开始淡出logo
-  setTimeout(() => {
-    logoFadeOut.value = true;
-    // 淡出动画完成后隐藏logo
+    // 5秒后开始淡出logo
     setTimeout(() => {
-      showLogo.value = false;
-    }, 500);
-  }, 5000);
+      logoFadeOut.value = true;
+      // 淡出动画完成后隐藏logo
+      setTimeout(() => {
+        showLogo.value = false;
+      }, 500);
+    }, 5000);
+  }
 
   if (newsStore.newsList.length === 0) {
     fetchNews();

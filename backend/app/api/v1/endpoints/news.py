@@ -80,6 +80,35 @@ async def read_news(
     )
 
 
+@router.get("/{id}", response_model=NewsSchema)
+async def get_news(
+    *,
+    db: AsyncSession = Depends(get_db),
+    id: int
+) -> Any:
+    """获取单个新闻详情（公开接口）"""
+    result = await db.execute(
+        select(News).options(selectinload(News.creator)).where(
+            and_(News.id == id, News.deleted_at.is_(None))
+        )
+    )
+    news = result.scalar_one_or_none()
+    
+    if not news:
+        raise HTTPException(status_code=404, detail="新闻未找到")
+    
+    return NewsSchema(
+        id=news.id,
+        title=news.title,
+        description=news.description,
+        image_url=news.image_url,
+        creator_id=news.creator_id,
+        created_at=news.created_at,
+        updated_at=news.updated_at,
+        creator_username=news.creator.username if news.creator else None
+    )
+
+
 @router.post("/", response_model=NewsSchema, status_code=status.HTTP_201_CREATED)
 async def create_news(
     *,
@@ -166,7 +195,7 @@ async def delete_news(
     db: AsyncSession = Depends(get_db),
     id: int,
     current_user: User = Depends(deps.get_current_active_user)
-) -> Any:
+) -> None:
     """删除新闻（软删除，需要认证和所有权）"""
     result = await db.execute(
         select(News).where(and_(News.id == id, News.deleted_at.is_(None)))

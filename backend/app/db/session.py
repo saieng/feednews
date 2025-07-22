@@ -5,7 +5,7 @@ from app.core.config import settings
 
 # 创建异步数据库引擎
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    settings.database_url,
     echo=True,  # 开发环境下显示SQL语句
     future=True
 )

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   frontend:
@@ -19,11 +19,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - POSTGRES_SERVER=db
-      - POSTGRES_USER=feednews_user
-      - POSTGRES_PASSWORD=feednews_strong_password_2024
-      - POSTGRES_DB=feednews_db
-      - DATABASE_URL=postgresql+asyncpg://feednews_user:feednews_strong_password_2024@db:5432/feednews_db
+      - POSTGRES_SERVER=localhost
+      - POSTGRES_USER=saieng
+      - POSTGRES_PASSWORD=yang1234
+      - POSTGRES_DB=feedNew
+      - DATABASE_URL=stgresql+asyncpg://saieng:yang1234@localhost:5432/feedNew
       - SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=1440
