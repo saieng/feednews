@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- 导航栏 -->
-    <nav class="bg-white shadow-sm border-b">
+    <nav v-if="!isAdminPage" class="bg-white shadow-sm border-b">
       <div class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
           <div class="flex items-center space-x-8">
@@ -58,14 +58,20 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import AuthModal from '@/components/auth/AuthModal.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const isAuthModalOpen = ref(false)
 const isLoading = ref(false)
+
+// 检查是否在管理后台页面
+const isAdminPage = computed(() => {
+  return route.path.startsWith('/admin')
+})
 
 const openAuthModal = () => {
   isAuthModalOpen.value = true

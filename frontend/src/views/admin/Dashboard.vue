@@ -4,7 +4,19 @@
     <nav class="bg-white shadow-sm border-b">
       <div class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-gray-900">管理后台</h1>
+          <div class="flex items-center space-x-4">
+            <router-link 
+              to="/"
+              @click="handleBackToHome"
+              class="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              <span>返回首页</span>
+            </router-link>
+            <h1 class="text-2xl font-bold text-gray-900">管理后台</h1>
+          </div>
           <div class="flex items-center space-x-4">
             <router-link 
               to="/admin/news/create"
@@ -53,7 +65,7 @@
               <tr class="border-b">
                 <th class="text-left p-4 font-medium text-gray-700">标题</th>
                 <th class="text-left p-4 font-medium text-gray-700">分类</th>
-                <th class="text-left p-4 font-medium text-gray-700">作者</th>
+                <th class="text-left p-4 font-medium text-gray-700">创建者</th>
                 <th class="text-left p-4 font-medium text-gray-700">发布时间</th>
                 <th class="text-left p-4 font-medium text-gray-700">操作</th>
               </tr>
@@ -70,8 +82,8 @@
                     {{ news.category }}
                   </span>
                 </td>
-                <td class="p-4 text-gray-600">{{ news.author }}</td>
-                <td class="p-4 text-gray-600">{{ formatDate(news.createdAt) }}</td>
+                <td class="p-4 text-gray-600">{{ news.creator?.username || 'Unknown' }}</td>
+                <td class="p-4 text-gray-600">{{ formatDate(news.created_at) }}</td>
                 <td class="p-4">
                   <div class="flex space-x-2">
                     <router-link 
@@ -129,7 +141,7 @@ const totalNews = computed(() => newsStore.totalNews)
 const todayNews = computed(() => {
   const today = new Date().toDateString()
   return newsStore.newsList.filter(news => 
-    new Date(news.createdAt).toDateString() === today
+    new Date(news.created_at).toDateString() === today
   ).length
 })
 
@@ -164,6 +176,11 @@ const handleDelete = async (id) => {
 const handleLogout = () => {
   authStore.logout()
   router.push('/')
+}
+
+const handleBackToHome = () => {
+  // 设置标记表示从管理后台返回
+  sessionStorage.setItem('fromAdmin', 'true')
 }
 
 const formatDate = (dateString) => {

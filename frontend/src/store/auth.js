@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isLoggedIn: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.token,
   },
 
   actions: {
@@ -64,9 +65,20 @@ export const useAuthStore = defineStore('auth', {
     async checkAuthStatus() {
       if (this.token) {
         try {
-          const response = await authService.getProfile()
-          this.user = response.data.user
-          return true
+          // 尝试调用一个需要认证的接口来验证token有效性
+          // 这里可以调用任何需要认证的接口，比如获取新闻列表
+          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1'}/news?page=1&size=1`, {
+            headers: {
+              'Authorization': `Bearer ${this.token}`
+            }
+          })
+          
+          if (response.ok) {
+            return true
+          } else {
+            this.logout()
+            return false
+          }
         } catch (error) {
           this.logout()
           return false
