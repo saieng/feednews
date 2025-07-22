@@ -1,33 +1,25 @@
 <template>
   <div class="relative overflow-hidden">
     <!-- Logo动画 -->
-    <div 
-      v-if="showLogo" 
+    <div v-if="showLogo"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 transition-opacity duration-500"
-      :class="{ 'opacity-0': logoFadeOut }"
-    >
+      :class="{ 'opacity-0': logoFadeOut }">
       <div class="relative">
-        <svg 
-          class="w-32 h-32 md:w-48 md:h-48 transition-transform duration-1000 ease-in-out"
-          :class="{
-            'scale-125': logoScale,
-            'scale-75': !logoScale
-          }"
-          viewBox="0 0 165.774 197.826"
-        >
+        <svg class="w-32 h-32 md:w-48 md:h-48 transition-transform duration-1000 ease-in-out" :class="{
+          'scale-125': logoScale,
+          'scale-75': !logoScale
+        }" viewBox="0 0 165.774 197.826">
           <g>
-            <path 
-              fill="#ffffff" 
-              d="M158.903,94.998L24.541,2.75c-7.14-4.9-16.889-3.07-21.789,4.046c-4.899,7.137-3.078,16.895,4.05,21.798
+            <path fill="#ffffff" d="M158.903,94.998L24.541,2.75c-7.14-4.9-16.889-3.07-21.789,4.046c-4.899,7.137-3.078,16.895,4.05,21.798
               l112.648,77.838l-90.363,49.234v-47.938h24.581L1.335,39.564v50.134v19.201v73.252c0,5.54,1.857,10.669,6.637,13.49
               c2.461,1.459,4.688,2.185,7.441,2.185c2.593,0,4.935-0.643,7.288-1.941l135.008-74.232c4.774-2.621,7.768-7.521,8.047-12.959
-              C166.019,103.271,163.386,98.082,158.903,94.998"
-            />
+              C166.019,103.271,163.386,98.082,158.903,94.998" />
           </g>
         </svg>
       </div>
     </div>
-    
+
+
     <!-- 导航栏 -->
     <nav v-show="!showLogo" class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm">
       <div class="container mx-auto px-4 py-4">
@@ -62,13 +54,11 @@
     </nav>
 
     <!-- 滚动容器 -->
-    <div ref="scrollContainer" class="fixed inset-0 overflow-y-auto scroll-smooth" 
-         @wheel.prevent="handleWheel" 
-         @touchstart="handleTouchStart" 
-         @touchmove="handleTouchMove" 
-         @touchend="handleTouchEnd">
+    <div ref="scrollContainer" class="fixed inset-0 overflow-y-auto scroll-smooth" @wheel.prevent="handleWheel"
+      @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
       <!-- 第一屏 - Introduction -->
-      <section id="intro" class="relative min-h-screen flex items-center justify-center overflow-hidden" :class="{ 'opacity-0': showLogo }">
+      <section id="intro" class="relative min-h-screen flex items-center justify-center overflow-hidden"
+        :class="{ 'opacity-0': showLogo }">
         <!-- 视频背景 -->
         <video autoplay muted loop class="absolute inset-0 w-full h-full object-cover">
           <source src="/src/static/video/intro.mp4" type="video/mp4">
@@ -81,29 +71,28 @@
         <canvas ref="particleCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
 
         <!-- 滚动文本容器 -->
-        <div ref="textContainer" class="absolute inset-0 flex flex-col justify-center items-center text-white z-20 overflow-hidden">
-          <div 
-            v-for="(line, index) in textLines" 
-            :key="index"
-            class="absolute left-0 right-0 text-center font-light transition-all duration-300 ease-out"
-            :style="{
+        <div ref="textContainer"
+          class="absolute inset-0 flex flex-col justify-center items-center text-white z-20 overflow-hidden">
+          <div v-for="(line, index) in textLines" :key="index"
+            class="absolute left-0 right-0 text-center font-light transition-all duration-300 ease-out" :style="{
               fontSize: getTextSize(index),
               opacity: getTextOpacity(index),
               transform: `translateY(${getTextTransform(index)}px)`,
               textShadow: '0 0 10px rgba(0, 0, 255, 0.5)',
               whiteSpace: 'nowrap'
-            }"
-          >
+            }">
             {{ line }}
           </div>
         </div>
 
         <!-- 滚动指示器 - 固定在底部，可点击 -->
-        <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30 cursor-pointer transition-all duration-300 hover:scale-110" 
-             @click="handleScrollIndicatorClick">
-          <div class="w-6 h-10 border-2 border-white rounded-full flex justify-center bg-black bg-opacity-20 backdrop-blur-sm">
-            <div class="w-1 h-3 bg-white rounded-full mt-2" 
-                 :class="textScrollComplete ? 'opacity-50' : 'animate-bounce'"></div>
+        <div
+          class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30 cursor-pointer transition-all duration-300 hover:scale-110"
+          @click="handleScrollIndicatorClick">
+          <div
+            class="w-6 h-10 border-2 border-white rounded-full flex justify-center bg-black bg-opacity-20 backdrop-blur-sm">
+            <div class="w-1 h-3 bg-white rounded-full mt-2"
+              :class="textScrollComplete ? 'opacity-50' : 'animate-bounce'"></div>
           </div>
           <p class="text-sm mt-2 text-center">{{ textScrollComplete ? 'Enter News' : 'Scroll to continue' }}</p>
         </div>
@@ -207,7 +196,7 @@ const textLines = [
 const getTextSize = (index) => {
   const progress = textScrollOffset.value;
   const offset = index - progress;
-  
+
   // 当前行或接近当前行
   if (Math.abs(offset) < 0.3) {
     return '3.2rem';
@@ -235,7 +224,7 @@ const getTextSize = (index) => {
 const getTextOpacity = (index) => {
   const progress = textScrollOffset.value;
   const distance = Math.abs(index - progress);
-  
+
   // 基于距离计算透明度，距离越近透明度越高，更快速的变化
   if (distance < 0.3) {
     return 1;
@@ -256,13 +245,13 @@ const getTextOpacity = (index) => {
 const getTextTransform = (index) => {
   const progress = textScrollOffset.value;
   const offset = (index - progress) * 50; // 行间距50px
-  
+
   // 如果文字在屏幕中间以上（offset < 0），让它们继续向上移动并放大
   if (offset < 0) {
     // 向上滚动的文字，距离越远向上移动越多
     return offset * 1.5; // 加速向上移动
   }
-  
+
   return offset;
 };
 
@@ -274,16 +263,16 @@ const updateScrollInfo = () => {
   // 更新最大滚动值以适应新的逐行滚动算法
   const maxTextScroll = textLines.length - 1;
   const newsSection = container.querySelector('#news');
-  
+
   // 根据滚动位置判断当前部分
   if (newsSection) {
     const isInNewsSection = scrollY.value >= newsSection.offsetTop - 100;
     currentSection.value = isInNewsSection ? 'news' : 'intro';
-    
+
     if (currentSection.value === 'intro') {
       // 在第一屏时，根据文本滚动偏移计算进度
       scrollProgress.value = Math.round((textScrollOffset.value / maxTextScroll) * 100);
-      
+
       if (textScrollOffset.value >= maxTextScroll) {
         if (!textScrollComplete.value) {
           textScrollComplete.value = true;
@@ -427,7 +416,7 @@ const handleWheel = (event) => {
 // 触摸事件处理
 const handleTouchStart = (event) => {
   if (currentSection.value !== 'intro') return;
-  
+
   touchStartY.value = event.touches[0].clientY;
   touchStartTime.value = Date.now();
   isTouching.value = true;
@@ -435,23 +424,23 @@ const handleTouchStart = (event) => {
 
 const handleTouchMove = (event) => {
   if (currentSection.value !== 'intro' || !isTouching.value) return;
-  
+
   event.preventDefault(); // 防止页面滚动
 };
 
 const handleTouchEnd = (event) => {
   if (currentSection.value !== 'intro' || !isTouching.value) return;
-  
+
   const touchEndY = event.changedTouches[0].clientY;
   const touchEndTime = Date.now();
   const deltaY = touchStartY.value - touchEndY;
   const deltaTime = touchEndTime - touchStartTime.value;
-  
+
   // 只有在快速滑动时才触发文本滚动
   if (Math.abs(deltaY) > 30 && deltaTime < 300) {
     const maxTextScroll = textLines.length - 1;
     const scrollStep = 2.4; // 触摸滚动速度也提升3倍
-    
+
     if (deltaY > 0) {
       // 向上滑动（向下滚动文本）
       textScrollOffset.value = Math.min(textScrollOffset.value + scrollStep, maxTextScroll);
@@ -461,7 +450,7 @@ const handleTouchEnd = (event) => {
     }
     updateScrollInfo();
   }
-  
+
   isTouching.value = false;
 };
 
@@ -475,7 +464,7 @@ const handleScrollIndicatorClick = () => {
 
 const handleScroll = (event) => {
   scrollY.value = event.target.scrollTop;
-  
+
   // 始终更新滚动信息，以便正确处理区域切换
   updateScrollInfo();
 };
@@ -586,12 +575,12 @@ const handleKeyPress = (event) => {
 
 onMounted(() => {
   windowHeight.value = window.innerHeight;
-  
+
   // 启动logo动画
   logoInterval = setInterval(() => {
     logoScale.value = !logoScale.value;
   }, 1000); // 每秒切换一次缩放状态
-  
+
   // 5秒后开始淡出logo
   setTimeout(() => {
     logoFadeOut.value = true;
@@ -600,7 +589,7 @@ onMounted(() => {
       showLogo.value = false;
     }, 500);
   }, 5000);
-  
+
   if (newsStore.newsList.length === 0) {
     fetchNews();
   }
