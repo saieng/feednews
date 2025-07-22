@@ -34,58 +34,20 @@
               >
             </div>
 
-            <!-- 分类 -->
+            <!-- 描述 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">分类 *</label>
-              <select 
-                v-model="form.category"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">请选择分类</option>
-                <option value="科技">科技</option>
-                <option value="财经">财经</option>
-                <option value="体育">体育</option>
-                <option value="娱乐">娱乐</option>
-                <option value="国际">国际</option>
-                <option value="国内">国内</option>
-              </select>
-            </div>
-
-            <!-- 摘要 -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">摘要 *</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">描述 *</label>
               <textarea 
-                v-model="form.summary"
+                v-model="form.description"
                 required
-                rows="3"
+                rows="5"
+                maxlength="500"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="请输入新闻摘要"
+                placeholder="请输入新闻描述（最多500字符）"
               ></textarea>
-            </div>
-
-            <!-- 内容 -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">内容 *</label>
-              <textarea 
-                v-model="form.content"
-                required
-                rows="10"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="请输入新闻内容"
-              ></textarea>
-            </div>
-
-            <!-- 作者 -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">作者 *</label>
-              <input 
-                v-model="form.author"
-                type="text"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="请输入作者名称"
-              >
+              <div class="text-sm text-gray-500 mt-1">
+                {{ form.description.length }}/500 字符
+              </div>
             </div>
 
             <!-- 图片上传 -->
@@ -146,11 +108,8 @@ const imagePreview = ref('')
 
 const form = reactive({
   title: '',
-  category: '',
-  summary: '',
-  content: '',
-  author: '',
-  imageUrl: '',
+  description: '',
+  image_url: '',
 })
 
 const handleImageUpload = async (event) => {
@@ -175,7 +134,7 @@ const handleImageUpload = async (event) => {
   reader.readAsDataURL(file)
 
   // 这里模拟上传图片，实际项目中应该调用newsService.uploadImage
-  form.imageUrl = URL.createObjectURL(file)
+  form.image_url = URL.createObjectURL(file)
 }
 
 const handleSubmit = async () => {

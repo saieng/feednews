@@ -53,7 +53,7 @@
               <tr class="border-b">
                 <th class="text-left p-4 font-medium text-gray-700">标题</th>
                 <th class="text-left p-4 font-medium text-gray-700">分类</th>
-                <th class="text-left p-4 font-medium text-gray-700">作者</th>
+                <th class="text-left p-4 font-medium text-gray-700">创建者</th>
                 <th class="text-left p-4 font-medium text-gray-700">发布时间</th>
                 <th class="text-left p-4 font-medium text-gray-700">操作</th>
               </tr>
@@ -70,8 +70,8 @@
                     {{ news.category }}
                   </span>
                 </td>
-                <td class="p-4 text-gray-600">{{ news.author }}</td>
-                <td class="p-4 text-gray-600">{{ formatDate(news.createdAt) }}</td>
+                <td class="p-4 text-gray-600">{{ news.creator?.username || 'Unknown' }}</td>
+                <td class="p-4 text-gray-600">{{ formatDate(news.created_at) }}</td>
                 <td class="p-4">
                   <div class="flex space-x-2">
                     <router-link 
@@ -129,7 +129,7 @@ const totalNews = computed(() => newsStore.totalNews)
 const todayNews = computed(() => {
   const today = new Date().toDateString()
   return newsStore.newsList.filter(news => 
-    new Date(news.createdAt).toDateString() === today
+    new Date(news.created_at).toDateString() === today
   ).length
 })
 

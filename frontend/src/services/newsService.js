@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
 
 class NewsService {
   constructor() {
@@ -30,10 +30,9 @@ class NewsService {
     )
   }
 
-  async getNews({ page = 1, limit = 12, category = null, search = null } = {}) {
+  async getNews({ page = 1, limit = 12, q = null } = {}) {
     const params = { page, limit }
-    if (category) params.category = category
-    if (search) params.search = search
+    if (q) params.q = q
     
     return this.api.get('/', { params })
   }

@@ -95,12 +95,10 @@ export const useNewsStore = defineStore('news', {
     async getNewsById(id) {
       try {
         const response = await newsService.getNewsById(id)
-        return { success: true, data: response.data }
+        return response.data
       } catch (error) {
-        return { 
-          success: false, 
-          error: error.response?.data?.message || '获取新闻详情失败' 
-        }
+        console.error('获取新闻详情失败:', error)
+        throw error
       }
     },
 
