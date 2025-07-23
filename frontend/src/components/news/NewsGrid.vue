@@ -3,7 +3,7 @@
     <!-- 响应式网格布局容器 -->
     <div 
       ref="gridContainer"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      class="grid grid-cols-1 lg:grid-cols-3 gap-6"
     >
       <div
         v-for="(news, index) in displayedNews" 
@@ -109,7 +109,7 @@ const handleCardClick = (news) => {
 
 // 加载更多新闻
 const loadMore = () => {
-  const increment = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1
+  const increment = window.innerWidth >= 1024 ? 3 : 1 // PC端每次加载3个，移动端每次加载1个
   displayCount.value += increment
   
   // 如果显示的新闻数量接近总数，触发加载更多数据
@@ -127,7 +127,6 @@ onMounted(() => {
   // 根据屏幕尺寸设置初始显示数量
   const getInitialCount = () => {
     if (window.innerWidth >= 1024) return 6 // PC端：2行 × 3列
-    if (window.innerWidth >= 768) return 4   // 平板：2行 × 2列
     return 2 // 移动端：2行 × 1列
   }
   displayCount.value = getInitialCount()
