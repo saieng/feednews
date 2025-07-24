@@ -11,15 +11,15 @@ export default defineConfig({
   },
   server: {
     allowedHosts: [
-      "9695d01a2b9e.ngrok-free.app",
+      "efce7f6aaaf4.ngrok-free.app",
       "localhost",
       "your-other-hosts",
     ],
     port: 3000,
     host: true,
     proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:8000',
+      "/api": {
+        target: "http://0.0.0.0:8000",
         changeOrigin: true,
         secure: false,
       },

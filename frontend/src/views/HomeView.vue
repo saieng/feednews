@@ -48,31 +48,25 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 用户认证区域 -->
           <div class="flex items-center space-x-4">
             <!-- 未登录状态 -->
             <div v-if="!authStore.isLoggedIn" class="flex items-center space-x-2">
-              <button 
-                @click="openAuthModal"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black"
-              >
+              <button @click="openAuthModal"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black">
                 登录 / 注册
               </button>
             </div>
-            
+
             <!-- 已登录状态 -->
             <div v-else class="flex items-center space-x-3">
-              <button 
-                @click="goToAdmin"
-                class="text-white text-sm hover:text-blue-300 transition-colors cursor-pointer underline decoration-dotted underline-offset-4"
-              >
+              <button @click="goToAdmin"
+                class="text-white text-sm hover:text-blue-300 transition-colors cursor-pointer underline decoration-dotted underline-offset-4">
                 欢迎，{{ authStore.user?.username || authStore.user?.email }}
               </button>
-              <button 
-                @click="handleLogout"
-                class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white border border-gray-600 hover:border-gray-400 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black"
-              >
+              <button @click="handleLogout"
+                class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white border border-gray-600 hover:border-gray-400 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black">
                 退出登录
               </button>
             </div>
@@ -82,30 +76,32 @@
     </nav>
 
     <!-- 白色过渡层 -->
-      <div v-if="isTransitioning && whiteScreenVisible" 
-        class="fixed inset-0 z-40 bg-white transition-all duration-500 ease-in-out"
-        :style="{
-          transform: whiteScreenTransform,
-          opacity: 1
-        }"
-      ></div>
-      
-      <!-- 紫色过渡层 -->
-      <div v-if="isTransitioning && purpleScreenVisible" 
-        class="fixed inset-0 z-50 bg-purple-600 transition-all duration-500 ease-in-out"
-        :style="{
-          transform: purpleScreenTransform,
-          opacity: 1
-        }"
-      ></div>
+    <div v-if="isTransitioning && whiteScreenVisible"
+      class="fixed inset-0 z-40 bg-white transition-all duration-500 ease-in-out" :style="{
+        transform: whiteScreenTransform,
+        opacity: 1
+      }"></div>
+
+    <!-- 紫色过渡层 -->
+    <div v-if="isTransitioning && purpleScreenVisible"
+      class="fixed inset-0 z-50 bg-purple-600 transition-all duration-500 ease-in-out" :style="{
+        transform: purpleScreenTransform,
+        opacity: 1
+      }"></div>
 
     <!-- 滚动容器 -->
-    <div v-show="!showLogo" ref="scrollContainer" class="fixed inset-0" 
-      style="overflow: hidden; scrollbar-width: none; -ms-overflow-style: none;"
-      @wheel="handleWheel" @scroll="handleScroll" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
+    <div v-show="!showLogo" ref="scrollContainer" class="fixed inset-0"
+      :style="{
+        overflow: currentSection === 'intro' ? 'hidden' : 'visible',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }"
+      @wheel="handleWheel"
+      @scroll="handleScroll" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
       <!-- 第一屏 - Introduction -->
-      <section id="intro" class="absolute inset-0 flex items-center justify-center overflow-hidden transition-all duration-1000 ease-out text-smooth no-select"
-        :class="{ 
+      <section id="intro"
+        class="absolute inset-0 flex items-center justify-center overflow-hidden transition-all duration-1000 ease-out text-smooth no-select"
+        :class="{
           'opacity-0': showLogo,
           'opacity-100 translate-y-0 scale-100': currentSection === 'intro' && !isTransitioning,
           'opacity-0 -translate-y-full scale-95': currentSection === 'news' && !isTransitioning,
@@ -138,8 +134,7 @@
         </div>
 
         <!-- 滚动指示器 - 固定在底部，可点击，只在第一屏显示 -->
-        <div
-          v-show="currentSection === 'intro'"
+        <div v-show="currentSection === 'intro'"
           class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30 cursor-pointer transition-all duration-300 hover:scale-110 flex flex-col items-center"
           @click="handleScrollIndicatorClick">
           <div
@@ -147,15 +142,21 @@
             <div class="w-1 h-3 bg-white rounded-full mt-2"
               :class="textScrollComplete ? 'opacity-50' : 'animate-bounce'"></div>
           </div>
-          <p class="text-sm mt-2 text-center whitespace-nowrap text-white">{{ textScrollComplete ? 'Enter News' : 'Scroll to continue' }}</p>
+          <p class="text-sm mt-2 text-center whitespace-nowrap text-white">{{ textScrollComplete ? 'Enter News' :
+            'Scroll to continue' }}</p>
         </div>
       </section>
 
       <!-- 第二屏 - News -->
-      <section id="news" class="absolute inset-0 bg-gray-50 pt-20 transition-all duration-1000 ease-out overflow-y-auto text-smooth"
-        style="scrollbar-width: thin; scrollbar-color: #cbd5e0 #f7fafc;"
-        @scroll="handleNewsScroll"
-        :class="{
+      <section id="news"
+        class="absolute inset-0 bg-gray-50 pt-20 transition-all duration-1000 ease-out overflow-y-auto text-smooth"
+        style="
+          scrollbar-width: thin;
+          scrollbar-color: #cbd5e0 #f7fafc;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+        "
+        @scroll="handleNewsScroll" :class="{
           'opacity-100 translate-y-0 scale-100': currentSection === 'news' && !isTransitioning,
           'opacity-0 translate-y-full scale-95': currentSection === 'intro' && !isTransitioning,
           'opacity-0': isTransitioning
@@ -166,7 +167,8 @@
             <div class="max-w-2xl mx-auto">
               <div class="relative">
                 <input v-model="searchQuery" type="text" placeholder="搜索新闻..."
-                  class="w-full px-6 py-4 pr-12 text-lg rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
+                  class="w-full pl-12 pr-12 py-4 text-lg rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white bg-opacity-90 backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
+                  style="text-indent: 10px;"
                   @input="handleSearch">
                 <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none"
                   stroke="currentColor" viewBox="0 0 24 24">
@@ -190,13 +192,9 @@
         </div>
       </section>
     </div>
-    
+
     <!-- 认证模态框 -->
-    <AuthModal 
-      :is-open="showAuthModal" 
-      @close="closeAuthModal" 
-      @success="handleAuthSuccess" 
-    />
+    <AuthModal :is-open="showAuthModal" @close="closeAuthModal" @success="handleAuthSuccess" />
   </div>
 </template>
 
@@ -288,7 +286,7 @@ const getTextSize = (index) => {
   const progress = textScrollOffset.value;
   const offset = index - progress;
   const isMobile = window.innerWidth < 768;
-  
+
   // 根据设备类型调整基础尺寸
   const baseScale = isMobile ? 0.6 : 1; // 手机端缩小到60%
 
@@ -395,7 +393,7 @@ const scrollToSection = (section, method = 'auto') => {
 
   switchMethod.value = method;
   isTransitioning.value = true;
-  
+
   // 设置过渡方向
   if (section === 'intro') {
     transitionDirection.value = 'up';
@@ -406,96 +404,96 @@ const scrollToSection = (section, method = 'auto') => {
   }
 
   if (section === 'news') {
-     // 保存当前introduction进度
-     savedIntroProgress.value = textScrollOffset.value;
-     
-     // 向下切换到新闻页面
-     // 第一步：白色屏幕滑入 (0-0.5秒)
-     whiteScreenVisible.value = true;
-     whiteScreenTransform.value = 'translateY(-100%)';
-     
-     setTimeout(() => {
-       whiteScreenTransform.value = 'translateY(0%)';
-     }, 100);
-     
-     // 第二步：紫色屏幕滑入覆盖白色 (0.5-1秒)
-     setTimeout(() => {
-       purpleScreenVisible.value = true;
-       purpleScreenTransform.value = 'translateY(-100%)';
-       
-       setTimeout(() => {
-         purpleScreenTransform.value = 'translateY(0%)';
-       }, 100);
-     }, 500);
-     
-     // 第三步：切换内容并退出 (1-2秒)
-     setTimeout(() => {
-       currentSection.value = section;
-       // 重置News页面滚动位置
-       newsScrollY.value = 0;
-       nextTick(() => {
-         const newsSection = document.getElementById('news');
-         if (newsSection) {
-           newsSection.scrollTop = 0;
-         }
-         updateScrollInfo();
-       });
-       
-       whiteScreenTransform.value = 'translateY(100%)';
-       purpleScreenTransform.value = 'translateY(100%)';
-       
-       setTimeout(() => {
-         // 重置状态
-         whiteScreenVisible.value = false;
-         purpleScreenVisible.value = false;
-         whiteScreenTransform.value = 'translateY(-100%)';
-         purpleScreenTransform.value = 'translateY(-100%)';
-         isTransitioning.value = false;
-       }, 500);
-     }, 1000);
+    // 保存当前introduction进度
+    savedIntroProgress.value = textScrollOffset.value;
+
+    // 向下切换到新闻页面
+    // 第一步：白色屏幕滑入 (0-0.5秒)
+    whiteScreenVisible.value = true;
+    whiteScreenTransform.value = 'translateY(-100%)';
+
+    setTimeout(() => {
+      whiteScreenTransform.value = 'translateY(0%)';
+    }, 100);
+
+    // 第二步：紫色屏幕滑入覆盖白色 (0.5-1秒)
+    setTimeout(() => {
+      purpleScreenVisible.value = true;
+      purpleScreenTransform.value = 'translateY(-100%)';
+
+      setTimeout(() => {
+        purpleScreenTransform.value = 'translateY(0%)';
+      }, 100);
+    }, 500);
+
+    // 第三步：切换内容并退出 (1-2秒)
+    setTimeout(() => {
+      currentSection.value = section;
+      // 重置News页面滚动位置
+      newsScrollY.value = 0;
+      nextTick(() => {
+        const newsSection = document.getElementById('news');
+        if (newsSection) {
+          newsSection.scrollTop = 0;
+        }
+        updateScrollInfo();
+      });
+
+      whiteScreenTransform.value = 'translateY(100%)';
+      purpleScreenTransform.value = 'translateY(100%)';
+
+      setTimeout(() => {
+        // 重置状态
+        whiteScreenVisible.value = false;
+        purpleScreenVisible.value = false;
+        whiteScreenTransform.value = 'translateY(-100%)';
+        purpleScreenTransform.value = 'translateY(-100%)';
+        isTransitioning.value = false;
+      }, 500);
+    }, 1000);
   } else {
-     // 向上切换到介绍页面
-     // 第一步：白色屏幕滑入 (0-0.5秒)
-     whiteScreenVisible.value = true;
-     whiteScreenTransform.value = 'translateY(100%)';
-     
-     setTimeout(() => {
-       whiteScreenTransform.value = 'translateY(0%)';
-     }, 100);
-     
-     // 第二步：紫色屏幕滑入覆盖白色 (0.5-1秒)
-     setTimeout(() => {
-       purpleScreenVisible.value = true;
-       purpleScreenTransform.value = 'translateY(100%)';
-       
-       setTimeout(() => {
-         purpleScreenTransform.value = 'translateY(0%)';
-       }, 100);
-     }, 500);
-     
-     // 第三步：切换内容并退出 (1-2秒)
-     setTimeout(() => {
-       currentSection.value = section;
-       const maxTextScroll = textLines.length - 1;
-       
-       // 恢复到保存的进度
-       textScrollOffset.value = savedIntroProgress.value;
-       textScrollComplete.value = savedIntroProgress.value >= maxTextScroll;
-       scrollProgress.value = Math.round((savedIntroProgress.value / maxTextScroll) * 100);
-       
-       whiteScreenTransform.value = 'translateY(-100%)';
-       purpleScreenTransform.value = 'translateY(-100%)';
-       
-       setTimeout(() => {
-         // 重置状态
-         whiteScreenVisible.value = false;
-         purpleScreenVisible.value = false;
-         whiteScreenTransform.value = 'translateY(100%)';
-         purpleScreenTransform.value = 'translateY(100%)';
-         isTransitioning.value = false;
-       }, 500);
-     }, 1000);
-   }
+    // 向上切换到介绍页面
+    // 第一步：白色屏幕滑入 (0-0.5秒)
+    whiteScreenVisible.value = true;
+    whiteScreenTransform.value = 'translateY(100%)';
+
+    setTimeout(() => {
+      whiteScreenTransform.value = 'translateY(0%)';
+    }, 100);
+
+    // 第二步：紫色屏幕滑入覆盖白色 (0.5-1秒)
+    setTimeout(() => {
+      purpleScreenVisible.value = true;
+      purpleScreenTransform.value = 'translateY(100%)';
+
+      setTimeout(() => {
+        purpleScreenTransform.value = 'translateY(0%)';
+      }, 100);
+    }, 500);
+
+    // 第三步：切换内容并退出 (1-2秒)
+    setTimeout(() => {
+      currentSection.value = section;
+      const maxTextScroll = textLines.length - 1;
+
+      // 恢复到保存的进度
+      textScrollOffset.value = savedIntroProgress.value;
+      textScrollComplete.value = savedIntroProgress.value >= maxTextScroll;
+      scrollProgress.value = Math.round((savedIntroProgress.value / maxTextScroll) * 100);
+
+      whiteScreenTransform.value = 'translateY(-100%)';
+      purpleScreenTransform.value = 'translateY(-100%)';
+
+      setTimeout(() => {
+        // 重置状态
+        whiteScreenVisible.value = false;
+        purpleScreenVisible.value = false;
+        whiteScreenTransform.value = 'translateY(100%)';
+        purpleScreenTransform.value = 'translateY(100%)';
+        isTransitioning.value = false;
+      }, 500);
+    }, 1000);
+  }
 }
 
 // 粒子系统
@@ -537,11 +535,11 @@ let wheelTimeout = null;
 
 const handleWheel = (event) => {
   if (isWheeling || isTransitioning.value) return;
-  
+
   // 在第一屏处理文本滚动
   if (currentSection.value === 'intro') {
     event.preventDefault(); // 只在intro页面阻止默认滚动
-    
+
     isWheeling = true;
     clearTimeout(wheelTimeout);
     wheelTimeout = setTimeout(() => {
@@ -570,7 +568,7 @@ const handleWheel = (event) => {
     const newsSection = document.getElementById('news');
     if (newsSection) {
       const scrollTop = newsSection.scrollTop;
-      
+
       // 如果在顶部且向上滚动，切换回第一屏
       if (scrollTop === 0 && event.deltaY < 0) {
         event.preventDefault(); // 只在需要切换时阻止默认滚动
@@ -598,7 +596,10 @@ const handleTouchStart = (event) => {
 const handleTouchMove = (event) => {
   if (!isTouching.value || isTransitioning.value) return;
 
-  event.preventDefault(); // 防止页面滚动
+  // 只在第一屏时阻止默认滚动行为，第二屏允许正常滚动
+  if (currentSection.value === 'intro') {
+    event.preventDefault(); // 防止页面滚动
+  }
 };
 
 const handleTouchEnd = (event) => {
@@ -609,8 +610,8 @@ const handleTouchEnd = (event) => {
   const deltaY = touchStartY.value - touchEndY;
   const deltaTime = touchEndTime - touchStartTime.value;
 
-  // 快速滑动检测
-  if (Math.abs(deltaY) > 50 && deltaTime < 300) {
+  // 快速滑动检测 - 需要更大的滑动距离和更快的速度
+  if (Math.abs(deltaY) > 80 && deltaTime < 300) {
     if (currentSection.value === 'intro') {
       const maxTextScroll = textLines.length - 1;
       const scrollStep = 3.0; // 触摸滚动步长
@@ -629,12 +630,13 @@ const handleTouchEnd = (event) => {
       }
       updateScrollInfo();
     } else if (currentSection.value === 'news') {
-      // 在第二屏时的滑动处理
+      // 在第二屏时的滑动处理 - 只在滚动到顶部且快速向下滑动时才切换
       const newsSection = document.getElementById('news');
-      if (newsSection && newsSection.scrollTop === 0 && deltaY < 0) {
-        // 在顶部向下滑动时切换回第一屏
+      if (newsSection && newsSection.scrollTop === 0 && deltaY < -100) {
+        // 需要更大的向下滑动距离才切换回第一屏
         scrollToSection('intro', 'touch');
       }
+      // 其他情况不处理，让浏览器处理正常的滚动
     }
   }
 
@@ -644,7 +646,7 @@ const handleTouchEnd = (event) => {
 // 滚动指示器点击事件
 const handleScrollIndicatorClick = () => {
   if (isTransitioning.value) return;
-  
+
   // 保存当前进度，然后直接跳转到第二屏
   savedIntroProgress.value = textScrollOffset.value;
   scrollToSection('news', 'click');
@@ -812,12 +814,12 @@ watch(searchQuery, () => {
 onMounted(async () => {
   // 检查是否从管理后台返回
   const fromAdmin = sessionStorage.getItem('fromAdmin')
-  
+
   // 只有不是从管理后台返回时才检查认证状态
   if (!fromAdmin) {
     await authStore.checkAuthStatus()
   }
-  
+
   windowHeight.value = window.innerHeight;
 
   // 检查是否从管理后台返回，如果是则跳过Logo动画
@@ -857,7 +859,8 @@ onMounted(async () => {
 
 <style scoped>
 /* 确保过渡效果的硬件加速 */
-#intro, #news {
+#intro,
+#news {
   will-change: transform, opacity;
   backface-visibility: hidden;
   transform-style: preserve-3d;
