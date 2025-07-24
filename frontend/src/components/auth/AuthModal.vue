@@ -61,6 +61,10 @@
             <div v-if="error" class="text-red-600 text-sm">
               {{ error }}
             </div>
+            
+            <div v-if="successMessage" class="text-green-600 text-sm">
+              {{ successMessage }}
+            </div>
           </div>
           
           <button 
@@ -103,6 +107,7 @@ const authStore = useAuthStore()
 const isLoginMode = ref(true)
 const isLoading = ref(false)
 const error = ref('')
+const successMessage = ref('')
 
 const form = reactive({
   username: '',
@@ -115,6 +120,7 @@ const resetForm = () => {
   form.email = ''
   form.password = ''
   error.value = ''
+  successMessage.value = ''
 }
 
 const toggleMode = () => {
@@ -125,6 +131,7 @@ const toggleMode = () => {
 const handleSubmit = async () => {
   isLoading.value = true
   error.value = ''
+  successMessage.value = ''
   
   try {
     const result = isLoginMode.value 
@@ -132,13 +139,33 @@ const handleSubmit = async () => {
       : await authStore.register({ username: form.username, email: form.email, password: form.password })
     
     if (result.success) {
-      emit('success')
-      close()
+      if (result.message) {
+        successMessage.value = result.message
+        // 如果是注册成功并自动登录，延迟关闭模态框以显示成功消息
+        if (!result.needManualLogin) {
+          setTimeout(() => {
+            emit('success')
+            close()
+          }, 1500)
+        } else {
+          // 需要手动登录，切换到登录模式
+          setTimeout(() => {
+            isLoginMode.value = true
+            resetForm()
+          }, 2000)
+        }
+      } else {
+        emit('success')
+        close()
+      }
     } else {
-      error.value = result.error
+      // 登录/注册失败时只显示错误提示，不刷新页面
+      error.value = result.error || (isLoginMode.value ? '用户名或密码错误' : '注册失败，请重试')
     }
   } catch (err) {
-    error.value = '操作失败，请重试'
+    // 捕获网络错误等异常，只显示提示不刷新页面
+    error.value = isLoginMode.value ? '登录失败，请检查用户名和密码' : '注册失败，请重试'
+    console.error('Auth error:', err)
   } finally {
     isLoading.value = false
   }
