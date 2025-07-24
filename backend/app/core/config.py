@@ -30,9 +30,13 @@ class Settings(BaseSettings):
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:5432/{self.POSTGRES_DB}"
     
     # JWT 配置
-    SECRET_KEY: str
+    SECRET_KEY: str = "default_secret_key_change_in_production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+    
+    # 第三方图片存储配置
+    IMGBB_API_KEY: str = ""
+    USE_THIRD_PARTY_STORAGE: bool = True
     
     class Config:
         env_file = ".env"

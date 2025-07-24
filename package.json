@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@tailwindcss/line-clamp": "^0.4.4",
+    "@tailwindcss/postcss": "^4.1.11",
     "gsap": "^3.13.0"
   }
 }
