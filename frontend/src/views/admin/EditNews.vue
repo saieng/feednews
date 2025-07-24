@@ -150,24 +150,45 @@ const handleImageUpload = async (event) => {
   const file = event.target.files[0]
   if (!file) return
 
+  // 清除之前的错误
+  submitError.value = ''
+
   if (!file.type.startsWith('image/')) {
     submitError.value = '请选择图片文件'
     return
   }
 
-  if (file.size > 500 * 1024) { // 限制为500KB
-    submitError.value = '图片大小不能超过500KB，请选择更小的图片或压缩后上传'
+  if (file.size > 2 * 1024 * 1024) { // 限制为2MB
+    submitError.value = '上传文件不能超出2M'
     return
   }
 
-  // 创建预览和保存图片URL
+  // 创建预览
   const reader = new FileReader()
   reader.onload = (e) => {
     imagePreview.value = e.target.result
-    // 使用base64数据作为图片URL，这样保存后也能正常显示
-    form.image_url = e.target.result
   }
   reader.readAsDataURL(file)
+
+  // 上传图片到服务器
+  try {
+    isUpdating.value = true
+    const uploadResult = await newsStore.uploadImage(file)
+    
+    if (uploadResult.success) {
+      form.image_url = uploadResult.data.filename
+      console.log('图片上传成功:', uploadResult.data)
+    } else {
+      submitError.value = uploadResult.error || '图片上传失败'
+      imagePreview.value = ''
+    }
+  } catch (err) {
+    console.error('图片上传错误:', err)
+    submitError.value = '图片上传失败，请重试'
+    imagePreview.value = ''
+  } finally {
+    isUpdating.value = false
+  }
 }
 
 const handleSubmit = async () => {

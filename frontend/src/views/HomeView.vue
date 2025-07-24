@@ -154,6 +154,7 @@
       <!-- 第二屏 - News -->
       <section id="news" class="absolute inset-0 bg-gray-50 pt-20 transition-all duration-1000 ease-out overflow-y-auto text-smooth"
         style="scrollbar-width: thin; scrollbar-color: #cbd5e0 #f7fafc;"
+        @scroll="handleNewsScroll"
         :class="{
           'opacity-100 translate-y-0 scale-100': currentSection === 'news' && !isTransitioning,
           'opacity-0 translate-y-full scale-95': currentSection === 'intro' && !isTransitioning,
@@ -246,6 +247,8 @@ const isTouching = ref(false)
 // 切换方式记录
 const switchMethod = ref('') // 'scroll' | 'click' | 'auto'
 const previousTextScrollOffset = ref(0) // 记录之前的具体文字行偏移
+const savedIntroProgress = ref(0) // 保存的introduction进度
+const newsScrollY = ref(0) // News页面的滚动位置
 
 // 过渡状态
 const isTransitioning = ref(false)
@@ -369,9 +372,19 @@ const updateScrollInfo = () => {
     } else {
       textScrollComplete.value = false;
     }
-  } else {
-    // 在第二屏时，进度条显示为100%
-    scrollProgress.value = 100;
+  } else if (currentSection.value === 'news') {
+    // 在第二屏时，根据滚动位置计算进度
+    const newsSection = document.getElementById('news');
+    if (newsSection) {
+      const scrollTop = newsSection.scrollTop;
+      const scrollHeight = newsSection.scrollHeight - newsSection.clientHeight;
+      if (scrollHeight > 0) {
+        scrollProgress.value = Math.round((scrollTop / scrollHeight) * 100);
+      } else {
+        scrollProgress.value = 0;
+      }
+      newsScrollY.value = scrollTop;
+    }
   }
 };
 
@@ -393,6 +406,9 @@ const scrollToSection = (section, method = 'auto') => {
   }
 
   if (section === 'news') {
+     // 保存当前introduction进度
+     savedIntroProgress.value = textScrollOffset.value;
+     
      // 向下切换到新闻页面
      // 第一步：白色屏幕滑入 (0-0.5秒)
      whiteScreenVisible.value = true;
@@ -415,6 +431,16 @@ const scrollToSection = (section, method = 'auto') => {
      // 第三步：切换内容并退出 (1-2秒)
      setTimeout(() => {
        currentSection.value = section;
+       // 重置News页面滚动位置
+       newsScrollY.value = 0;
+       nextTick(() => {
+         const newsSection = document.getElementById('news');
+         if (newsSection) {
+           newsSection.scrollTop = 0;
+         }
+         updateScrollInfo();
+       });
+       
        whiteScreenTransform.value = 'translateY(100%)';
        purpleScreenTransform.value = 'translateY(100%)';
        
@@ -451,15 +477,11 @@ const scrollToSection = (section, method = 'auto') => {
      setTimeout(() => {
        currentSection.value = section;
        const maxTextScroll = textLines.length - 1;
-       if (method === 'scroll') {
-         textScrollOffset.value = maxTextScroll;
-         textScrollComplete.value = true;
-         scrollProgress.value = 100;
-       } else if (method === 'click') {
-         textScrollOffset.value = previousTextScrollOffset.value;
-         textScrollComplete.value = previousTextScrollOffset.value >= maxTextScroll;
-         scrollProgress.value = Math.round((previousTextScrollOffset.value / maxTextScroll) * 100);
-       }
+       
+       // 恢复到保存的进度
+       textScrollOffset.value = savedIntroProgress.value;
+       textScrollComplete.value = savedIntroProgress.value >= maxTextScroll;
+       scrollProgress.value = Math.round((savedIntroProgress.value / maxTextScroll) * 100);
        
        whiteScreenTransform.value = 'translateY(-100%)';
        purpleScreenTransform.value = 'translateY(-100%)';
@@ -516,10 +538,10 @@ let wheelTimeout = null;
 const handleWheel = (event) => {
   if (isWheeling || isTransitioning.value) return;
   
-  event.preventDefault(); // 始终阻止默认滚动，确保无滚动条
-
   // 在第一屏处理文本滚动
   if (currentSection.value === 'intro') {
+    event.preventDefault(); // 只在intro页面阻止默认滚动
+    
     isWheeling = true;
     clearTimeout(wheelTimeout);
     wheelTimeout = setTimeout(() => {
@@ -543,19 +565,24 @@ const handleWheel = (event) => {
     }
     updateScrollInfo();
   }
-  // 在第二屏处理切换回第一屏
+  // 在第二屏处理滚动和切换
   else if (currentSection.value === 'news') {
-    isWheeling = true;
-    clearTimeout(wheelTimeout);
-    wheelTimeout = setTimeout(() => {
-      isWheeling = false;
-    }, 100);
-    
-    if (event.deltaY < 0) {
-      // 向上滚动时切换回第一屏
-      scrollToSection('intro', 'scroll');
+    const newsSection = document.getElementById('news');
+    if (newsSection) {
+      const scrollTop = newsSection.scrollTop;
+      
+      // 如果在顶部且向上滚动，切换回第一屏
+      if (scrollTop === 0 && event.deltaY < 0) {
+        event.preventDefault(); // 只在需要切换时阻止默认滚动
+        isWheeling = true;
+        clearTimeout(wheelTimeout);
+        wheelTimeout = setTimeout(() => {
+          isWheeling = false;
+        }, 100);
+        scrollToSection('intro', 'scroll');
+      }
+      // 其他情况允许正常滚动，不阻止默认行为
     }
-    // 向下滚动时可以添加其他逻辑，比如加载更多新闻
   }
 };
 
@@ -603,8 +630,9 @@ const handleTouchEnd = (event) => {
       updateScrollInfo();
     } else if (currentSection.value === 'news') {
       // 在第二屏时的滑动处理
-      if (deltaY < 0) {
-        // 向下滑动时切换回第一屏
+      const newsSection = document.getElementById('news');
+      if (newsSection && newsSection.scrollTop === 0 && deltaY < 0) {
+        // 在顶部向下滑动时切换回第一屏
         scrollToSection('intro', 'touch');
       }
     }
@@ -618,8 +646,15 @@ const handleScrollIndicatorClick = () => {
   if (isTransitioning.value) return;
   
   // 保存当前进度，然后直接跳转到第二屏
-  previousTextScrollOffset.value = textScrollOffset.value;
+  savedIntroProgress.value = textScrollOffset.value;
   scrollToSection('news', 'click');
+};
+
+// News页面滚动事件处理
+const handleNewsScroll = () => {
+  if (currentSection.value === 'news') {
+    updateScrollInfo();
+  }
 };
 
 const handleScroll = (event) => {
@@ -775,13 +810,17 @@ watch(searchQuery, () => {
 
 // 在组件挂载时检查认证状态
 onMounted(async () => {
-  // 检查认证状态
-  await authStore.checkAuthStatus()
+  // 检查是否从管理后台返回
+  const fromAdmin = sessionStorage.getItem('fromAdmin')
+  
+  // 只有不是从管理后台返回时才检查认证状态
+  if (!fromAdmin) {
+    await authStore.checkAuthStatus()
+  }
   
   windowHeight.value = window.innerHeight;
 
   // 检查是否从管理后台返回，如果是则跳过Logo动画
-  const fromAdmin = sessionStorage.getItem('fromAdmin')
   if (fromAdmin) {
     // 清除标记
     sessionStorage.removeItem('fromAdmin')

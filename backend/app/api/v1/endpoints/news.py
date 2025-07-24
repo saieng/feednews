@@ -40,7 +40,7 @@ def get_full_image_url(image_url: Optional[str]) -> Optional[str]:
         return image_url
     
     # 拼接完整URL
-    full_url = f"{settings.SERVER_HOST}/{settings.UPLOAD_DIR}/{image_url.lstrip('/')}"
+    full_url = f"{settings.SERVER_HOST}/uploads/{image_url.lstrip('/')}"
     logger.debug(f"拼接图片URL: {image_url} -> {full_url}")
     return full_url
 
@@ -294,14 +294,14 @@ async def upload_image(
             detail="只支持图片文件"
         )
     
-    # 检查文件大小（限制为5MB）
-    max_size = 5 * 1024 * 1024  # 5MB
+    # 检查文件大小（限制为2MB）
+    max_size = 2 * 1024 * 1024  # 2MB
     content = await image.read()
     if len(content) > max_size:
         logger.error(f"文件过大: {len(content)} bytes")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="文件大小不能超过5MB"
+            detail="上传文件不能超出2M"
         )
     
     # 生成唯一文件名
@@ -309,12 +309,8 @@ async def upload_image(
     unique_filename = f"{uuid.uuid4().hex}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_extension}"
     
     # 确保上传目录存在
-    upload_dir = settings.UPLOAD_DIR
-    if not os.path.isabs(upload_dir):
-        # 直接使用backend目录下的uploads
-        # __file__ 是 backend/app/api/v1/endpoints/news.py，向上五级到backend目录
-        backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
-        upload_dir = os.path.join(backend_dir, upload_dir)
+    # 使用绝对路径避免Windows路径长度限制
+    upload_dir = r"e:\my_project\feedNews\trae\backend\uploads"
     
     logger.info(f"计算的上传目录路径: {upload_dir}")
     

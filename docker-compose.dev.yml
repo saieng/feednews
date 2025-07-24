@@ -28,7 +28,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - POSTGRES_SERVER=db
+      - POSTGRES_SERVER=localhost
       - POSTGRES_USER=saieng
       - POSTGRES_PASSWORD=yang1234
       - POSTGRES_DB=feedNew
@@ -45,21 +45,20 @@ services:
 
   db:
     image: postgres:15
-    restart: always
     environment:
-      POSTGRES_USER: saieng
-      POSTGRES_PASSWORD: yang1234
-      POSTGRES_DB: feedNew
+      - POSTGRES_USER=saieng
+      - POSTGRES_PASSWORD=yang1234
+      - POSTGRES_DB=feedNew
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data_dev:/var/lib/postgresql/data
     networks:
       - feednews-network
+
+volumes:
+  postgres_data:
 
 networks:
   feednews-network:
     driver: bridge
-
-volumes:
-  postgres_data_dev:

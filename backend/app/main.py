@@ -37,12 +37,8 @@ app.add_middleware(
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 # 挂载静态文件服务
-upload_dir = settings.UPLOAD_DIR
-if not os.path.isabs(upload_dir):
-    # 直接使用backend目录下的uploads
-    # __file__ 是 backend/app/main.py，向上两级到backend目录
-    backend_dir = os.path.dirname(os.path.dirname(__file__))
-    upload_dir = os.path.join(backend_dir, upload_dir)
+# 使用相对路径，适配Docker容器环境
+upload_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
 
 print(f"静态文件服务 - 计算的上传目录路径: {upload_dir}")
 

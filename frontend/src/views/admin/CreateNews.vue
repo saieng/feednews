@@ -125,8 +125,8 @@ const handleImageUpload = async (event) => {
     return
   }
 
-  if (file.size > 5 * 1024 * 1024) { // 限制为5MB
-    error.value = '图片大小不能超过5MB，请选择更小的图片或压缩后上传'
+  if (file.size > 2 * 1024 * 1024) { // 限制为2MB
+    error.value = '上传文件不能超出2M'
     return
   }
 

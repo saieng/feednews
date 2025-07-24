@@ -5,14 +5,14 @@
       <div class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
           <div class="flex items-center space-x-2 md:space-x-4">
-            <router-link to="/" @click="handleBackToHome"
+            <button @click="handleBackToHome"
               class="flex items-center space-x-1 md:space-x-2 text-blue-600 hover:text-blue-800 transition-colors">
               <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
                 </path>
               </svg>
               <span class="text-sm md:text-base">返回首页</span>
-            </router-link>
+            </button>
             <h1 class="text-lg md:text-2xl font-bold text-gray-900">管理后台</h1>
           </div>
           <div class="flex items-center space-x-2 md:space-x-4">
@@ -33,7 +33,7 @@
     <!-- 主要内容 -->
     <div class="container mx-auto px-4 py-8">
       <!-- 统计卡片 -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+      <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         <div class="bg-white p-4 md:p-6 rounded-lg shadow">
           <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-2">总新闻数</h3>
           <p class="text-2xl md:text-3xl font-bold text-blue-600">{{ totalNews }}</p>
@@ -46,7 +46,7 @@
           <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-2">总浏览量</h3>
           <p class="text-2xl md:text-3xl font-bold text-purple-600">{{ totalViews }}</p>
         </div>
-      </div>
+      </div> -->
 
       <!-- 新闻列表 -->
       <div class="bg-white rounded-lg shadow">
@@ -198,6 +198,8 @@ const handleLogout = () => {
 const handleBackToHome = () => {
   // 设置标记表示从管理后台返回
   sessionStorage.setItem('fromAdmin', 'true')
+  // 直接跳转到首页，不触发页面重新加载
+  router.push('/')
 }
 
 const formatDate = (dateString) => {
