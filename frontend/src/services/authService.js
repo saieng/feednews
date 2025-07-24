@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/v1";
+const API_URL = import.meta.env.VITE_API_BASE_URL + "/api/v1";
 
 class AuthService {
   constructor() {
@@ -30,7 +30,7 @@ class AuthService {
         if (error.response?.status === 401) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          window.location.href = "/";
+          // 不再自动重定向，让组件处理错误
         }
         return Promise.reject(error);
       }

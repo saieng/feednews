@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "FeedNews"
     API_V1_STR: str = "/api/v1"
     
+    # 服务器配置
+    SERVER_HOST: str = "http://localhost:8000"
+    UPLOAD_DIR: str = "uploads"
+    
     # 数据库配置
     POSTGRES_SERVER: Optional[str] = None
     POSTGRES_USER: Optional[str] = None

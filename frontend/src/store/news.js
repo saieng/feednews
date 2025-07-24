@@ -58,7 +58,7 @@ export const useNewsStore = defineStore('news', {
       } catch (error) {
         return { 
           success: false, 
-          error: error.response?.data?.message || '创建新闻失败' 
+          error: error.response?.data?.detail || error.message || '创建新闻失败' 
         }
       }
     },
@@ -74,7 +74,7 @@ export const useNewsStore = defineStore('news', {
       } catch (error) {
         return { 
           success: false, 
-          error: error.response?.data?.message || '更新新闻失败' 
+          error: error.response?.data?.detail || error.message || '更新新闻失败' 
         }
       }
     },
@@ -88,7 +88,7 @@ export const useNewsStore = defineStore('news', {
       } catch (error) {
         return { 
           success: false, 
-          error: error.response?.data?.message || '删除新闻失败' 
+          error: error.response?.data?.detail || error.message || '删除新闻失败' 
         }
       }
     },
@@ -96,10 +96,26 @@ export const useNewsStore = defineStore('news', {
     async getNewsById(id) {
       try {
         const response = await newsService.getNewsById(id)
-        return response.data
+        return { success: true, data: response.data }
       } catch (error) {
         console.error('获取新闻详情失败:', error)
-        throw error
+        return { 
+          success: false, 
+          error: error.response?.data?.detail || error.message || '获取新闻详情失败' 
+        }
+      }
+    },
+
+    async uploadImage(file) {
+      try {
+        const response = await newsService.uploadImage(file)
+        return { success: true, data: response.data }
+      } catch (error) {
+        console.error('图片上传失败:', error)
+        return { 
+          success: false, 
+          error: error.response?.data?.detail || error.message || '图片上传失败' 
+        }
       }
     },
 

@@ -1,19 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 overflow-y-auto max-h-screen">
     <!-- 返回首页按钮 -->
     <div class="bg-white shadow-sm border-b">
       <div class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-gray-900">编辑新闻</h1>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-900">编辑新闻</h1>
           <router-link 
-              to="/"
-              @click="handleBackToHome"
+              to="/admin/dashboard"
               class="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
-              <span>返回首页</span>
+              <span>返回</span>
             </router-link>
         </div>
       </div>
@@ -30,7 +29,7 @@
       </div>
 
       <div v-else-if="news" class="max-w-4xl mx-auto">
-        <form @submit.prevent="handleSubmit" class="bg-white rounded-lg shadow p-6">
+        <form @submit.prevent="handleSubmit" class="bg-white rounded-lg shadow p-4 sm:p-6">
           <div class="space-y-6">
             <!-- 标题 -->
             <div>
@@ -71,24 +70,24 @@
                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 >
                 <div v-if="imagePreview" class="mt-2">
-                  <img :src="imagePreview" alt="预览" class="max-w-xs rounded-lg">
+                  <img :src="imagePreview" alt="预览" class="max-w-xs max-h-48 object-cover rounded-lg">
                 </div>
                 <div v-else-if="form.image_url" class="mt-2">
-                  <img :src="form.image_url" alt="当前图片" class="max-w-xs rounded-lg">
+                  <img :src="form.image_url" alt="当前图片" class="max-w-xs max-h-48 object-cover rounded-lg">
                 </div>
               </div>
             </div>
 
             <!-- 错误提示 -->
-            <div v-if="error" class="text-red-600 text-sm">
-              {{ error }}
+            <div v-if="submitError" class="text-red-600 text-sm">
+              {{ submitError }}
             </div>
 
             <!-- 提交按钮 -->
-            <div class="flex justify-end space-x-4">
+            <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
               <router-link 
                 to="/admin/dashboard"
-                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-center"
               >
                 取消
               </router-link>
@@ -121,6 +120,7 @@ const newsStore = useNewsStore()
 const news = ref(null)
 const isLoading = ref(true)
 const error = ref('')
+const submitError = ref('')
 const isUpdating = ref(false)
 const imagePreview = ref('')
 
@@ -150,13 +150,16 @@ const handleImageUpload = async (event) => {
   const file = event.target.files[0]
   if (!file) return
 
+  // 清除之前的错误
+  submitError.value = ''
+
   if (!file.type.startsWith('image/')) {
-    error.value = '请选择图片文件'
+    submitError.value = '请选择图片文件'
     return
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    error.value = '图片大小不能超过5MB'
+  if (file.size > 2 * 1024 * 1024) { // 限制为2MB
+    submitError.value = '上传文件不能超出2M'
     return
   }
 
@@ -167,13 +170,30 @@ const handleImageUpload = async (event) => {
   }
   reader.readAsDataURL(file)
 
-  // 这里模拟上传图片，实际项目中应该调用newsService.uploadImage
-  form.image_url = URL.createObjectURL(file)
+  // 上传图片到服务器
+  try {
+    isUpdating.value = true
+    const uploadResult = await newsStore.uploadImage(file)
+    
+    if (uploadResult.success) {
+      form.image_url = uploadResult.data.filename
+      console.log('图片上传成功:', uploadResult.data)
+    } else {
+      submitError.value = uploadResult.error || '图片上传失败'
+      imagePreview.value = ''
+    }
+  } catch (err) {
+    console.error('图片上传错误:', err)
+    submitError.value = '图片上传失败，请重试'
+    imagePreview.value = ''
+  } finally {
+    isUpdating.value = false
+  }
 }
 
 const handleSubmit = async () => {
   isUpdating.value = true
-  error.value = ''
+  submitError.value = ''
 
   try {
     const result = await newsStore.updateNews(route.params.id, form)
@@ -181,19 +201,16 @@ const handleSubmit = async () => {
     if (result.success) {
       router.push('/admin/dashboard')
     } else {
-      error.value = result.error
+      submitError.value = result.error
     }
   } catch (err) {
-    error.value = '更新失败，请重试'
+    submitError.value = '更新失败，请重试'
   } finally {
     isUpdating.value = false
   }
 }
 
-const handleBackToHome = () => {
-  // 设置标记表示从管理后台返回
-  sessionStorage.setItem('fromAdmin', 'true')
-}
+
 
 onMounted(() => {
   loadNews()
