@@ -13,14 +13,16 @@
 ## 🚀 技术栈
 
 ### 前端
+
 - **框架**: Vue 3 (Composition API)
 - **构建工具**: Vite
-- **UI框架**: Tailwind CSS
+- **UI 框架**: Tailwind CSS
 - **状态管理**: Pinia
 - **路由**: Vue Router
-- **HTTP客户端**: Axios
+- **HTTP 客户端**: Axios
 
 ### 后端
+
 - **语言**: Python 3.11+
 - **框架**: FastAPI
 - **数据库**: PostgreSQL
@@ -29,8 +31,9 @@
 - **数据验证**: Pydantic
 
 ### 部署
+
 - **容器化**: Docker + Docker Compose
-- **Web服务器**: Nginx (前端静态文件)
+- **Web 服务器**: Nginx (前端静态文件)
 - **数据持久化**: PostgreSQL 数据卷
 
 ## 📱 功能特性
@@ -38,18 +41,21 @@
 ### 🎨 前端功能
 
 #### 第一屏 - Introduction
+
 - **多层视差滚动背景**: 营造深度感的动态背景效果
 - **文字动画**: 主标题逐字淡入，副标题滑入效果
 - **鼠标跟随**: 文字阴影跟随鼠标移动
 - **色彩动画**: HSL 色彩空间循环渐变
 
 #### 第二屏 - News
-- **响应式网格布局**: PC端3列，平板2列，移动端1列
-- **新闻卡片**: 16:9图片比例，悬停动效
+
+- **响应式网格布局**: PC 端 3 列，平板 2 列，移动端 1 列
+- **新闻卡片**: 16:9 图片比例，悬停动效
 - **懒加载**: 按需加载更多新闻内容
 - **搜索功能**: 支持标题和描述搜索
 
 #### 交互体验
+
 - **平滑页面切换**: 滚轮/触摸触发的页面切换动画
 - **进度指示**: 实时显示滚动进度
 - **移动端优化**: 支持手势滑动和触摸交互
@@ -57,17 +63,20 @@
 ### 🔧 后端功能
 
 #### 用户系统
-- **用户注册/登录**: JWT认证，密码加密存储
+
+- **用户注册/登录**: JWT 认证，密码加密存储
 - **权限管理**: 普通用户和管理员角色
-- **安全防护**: 防止SQL注入、XSS攻击
+- **安全防护**: 防止 SQL 注入、XSS 攻击
 
 #### 新闻管理
-- **CRUD操作**: 创建、读取、更新、删除新闻
+
+- **CRUD 操作**: 创建、读取、更新、删除新闻
 - **图片上传**: 支持本地存储和云存储
 - **软删除**: 保留历史记录的删除机制
 - **分页查询**: 高效的分页和搜索功能
 
 #### 管理后台
+
 - **新闻管理**: 表格展示，批量操作
 - **富文本编辑**: 支持图片上传和预览
 - **权限控制**: 基于角色的访问控制
@@ -75,6 +84,7 @@
 ## 🛠️ 快速开始
 
 ### 环境要求
+
 - Docker 20.10+
 - Docker Compose 2.0+
 - Node.js 18+ (本地开发)
@@ -92,13 +102,15 @@ docker-compose -f docker-compose.dev.yml up
 ```
 
 访问地址:
+
 - 前端: http://localhost:3000
-- 后端API: http://localhost:8000
-- API文档: http://localhost:8000/docs
+- 后端 API: http://localhost:8000
+- API 文档: http://localhost:8000/docs
 
 ### 本地开发
 
 #### 后端开发
+
 ```bash
 cd backend
 
@@ -114,6 +126,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 #### 前端开发
+
 ```bash
 cd frontend
 
@@ -129,6 +142,7 @@ npm run dev
 ### 生产环境部署
 
 1. **环境变量配置**
+
 ```bash
 # 复制环境变量模板
 cp backend/.env.example backend/.env
@@ -140,6 +154,7 @@ vim frontend/.env
 ```
 
 2. **启动生产环境**
+
 ```bash
 # 构建并启动服务
 docker-compose up -d
@@ -152,6 +167,7 @@ docker-compose logs -f
 ```
 
 3. **数据库初始化**
+
 ```bash
 # 进入后端容器
 docker-compose exec backend bash
@@ -163,6 +179,7 @@ python -c "from app.db.init_db import init_db; init_db()"
 ### 环境变量说明
 
 #### 后端环境变量
+
 ```env
 # 数据库配置
 POSTGRES_SERVER=db
@@ -181,6 +198,7 @@ API_V1_STR=/api/v1
 ```
 
 #### 前端环境变量
+
 ```env
 # API地址
 VITE_API_BASE_URL=http://localhost:8000/api
@@ -220,18 +238,21 @@ feedNews/trae/
 
 ## 🔗 API 文档
 
-启动后端服务后，可以通过以下地址访问API文档:
+启动后端服务后，可以通过以下地址访问 API 文档:
+
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-### 主要API端点
+### 主要 API 端点
 
 #### 认证相关
+
 - `POST /api/auth/register` - 用户注册
 - `POST /api/auth/token` - 用户登录
 - `POST /api/auth/logout` - 用户登出
 
 #### 新闻相关
+
 - `GET /api/news/` - 获取新闻列表
 - `POST /api/news/` - 创建新闻 (需认证)
 - `PUT /api/news/{id}` - 更新新闻 (需认证)
@@ -240,25 +261,27 @@ feedNews/trae/
 ## 🎯 性能优化
 
 ### 前端优化
+
 - **代码分割**: 路由级别的懒加载
-- **图片优化**: WebP格式 + 懒加载
-- **动画优化**: 使用transform和opacity属性
+- **图片优化**: WebP 格式 + 懒加载
+- **动画优化**: 使用 transform 和 opacity 属性
 - **缓存策略**: 静态资源长期缓存
 
 ### 后端优化
-- **异步处理**: SQLAlchemy异步模式
+
+- **异步处理**: SQLAlchemy 异步模式
 - **连接池**: 数据库连接池管理
-- **缓存机制**: Redis缓存热点数据
-- **API限流**: 防止恶意请求
+- **缓存机制**: Redis 缓存热点数据
+- **API 限流**: 防止恶意请求
 
 ## 🔒 安全特性
 
-- **密码加密**: bcrypt哈希加密
-- **JWT认证**: 安全的token机制
-- **CORS配置**: 跨域请求控制
-- **输入验证**: Pydantic数据验证
-- **SQL注入防护**: ORM参数化查询
-- **XSS防护**: 输入内容转义
+- **密码加密**: bcrypt 哈希加密
+- **JWT 认证**: 安全的 token 机制
+- **CORS 配置**: 跨域请求控制
+- **输入验证**: Pydantic 数据验证
+- **SQL 注入防护**: ORM 参数化查询
+- **XSS 防护**: 输入内容转义
 
 ## 🤝 贡献指南
 
@@ -271,14 +294,3 @@ feedNews/trae/
 ## 📄 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 📞 联系方式
-
-如有问题或建议，请通过以下方式联系:
-- 提交 Issue
-- 发送邮件
-- 项目讨论区
-
----
-
-⭐ 如果这个项目对你有帮助，请给它一个星标！
