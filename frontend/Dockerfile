@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # 使用 Nginx 作为生产环境服务器
-FROM nginx:stable AS production-stage
+FROM nginx:1.24-alpine AS production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
