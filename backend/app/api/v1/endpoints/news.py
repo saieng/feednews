@@ -3,12 +3,14 @@ from math import ceil
 import logging
 import os
 import uuid
+import base64
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import selectinload
+import aiohttp
 
 from app.api import deps
 from app.db.session import get_db
@@ -28,6 +30,34 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+async def upload_to_imgbb(file_content: bytes, filename: str) -> Optional[str]:
+    """上传图片到 ImgBB"""
+    if not settings.IMGBB_API_KEY:
+        return None
+    
+    try:
+        # 将文件内容转换为 base64
+        image_base64 = base64.b64encode(file_content).decode('utf-8')
+        
+        # 准备上传数据
+        data = {
+            'key': settings.IMGBB_API_KEY,
+            'image': image_base64,
+            'name': filename
+        }
+        
+        # 发送请求到 ImgBB API
+        async with aiohttp.ClientSession() as session:
+            async with session.post('https://api.imgbb.com/1/upload', data=data) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result.get('success'):
+                        return result['data']['url']
+                return None
+    except Exception as e:
+        print(f"ImgBB upload error: {e}")
+        return None
+
 def get_full_image_url(image_url: Optional[str]) -> Optional[str]:
     """获取完整的图片URL"""
     if not image_url:
@@ -38,6 +68,7 @@ def get_full_image_url(image_url: Optional[str]) -> Optional[str]:
     if image_url.startswith(('http://', 'https://')):
         logger.debug(f"图片URL已是完整路径: {image_url}")
         return image_url
+    logger.debug(f"settings.SERVER_HOST: {settings.SERVER_HOST}")
     
     # 拼接完整URL
     full_url = f"{settings.SERVER_HOST}/uploads/{image_url.lstrip('/')}"
@@ -308,6 +339,21 @@ async def upload_image(
     file_extension = os.path.splitext(image.filename)[1] if image.filename else '.jpg'
     unique_filename = f"{uuid.uuid4().hex}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_extension}"
     
+    # 优先尝试上传到 ImgBB
+    if hasattr(settings, 'USE_THIRD_PARTY_STORAGE') and settings.USE_THIRD_PARTY_STORAGE and settings.IMGBB_API_KEY:
+        logger.info("尝试上传到 ImgBB")
+        imgbb_url = await upload_to_imgbb(content, unique_filename)
+        if imgbb_url:
+            logger.info(f"ImgBB 上传成功: {imgbb_url}")
+            return {
+                "message": "图片上传成功",
+                "filename": imgbb_url,
+                "url": imgbb_url
+            }
+        else:
+            logger.warning("ImgBB 上传失败，回退到本地存储")
+    
+    # 回退到本地存储
     # 确保上传目录存在
     # 使用绝对路径避免Windows路径长度限制
     upload_dir = r"e:\my_project\feedNews\trae\backend\uploads"
